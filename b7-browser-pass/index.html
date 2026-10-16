@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Ca-demo | A Personal Note</title>
+  <script>
+  (function(){
+    window.__presellPrivacyReady=false;
+    var params=new URLSearchParams(window.location.search);
+    var slotList=[{"key":"fn","maxLength":40},{"key":"city","maxLength":60},{"key":"poi","maxLength":80},{"key":"q1","maxLength":300},{"key":"q2","maxLength":300},{"key":"q3","maxLength":300}];
+    var privateKeys=Object.create(null);
+    var values={};
+    slotList.forEach(function(slot){
+      privateKeys[slot.key]=true;
+      var value=params.get(slot.key);
+      if(value===null)return;
+      value=value.replace(/[\u0000-\u001f\u007f-\u009f]/g,'').trim();
+      if(!value||Array.from(value).length>slot.maxLength)return;
+      values[slot.key]=value;
+    });
+    var tracking=[];
+    params.forEach(function(value,key){if(key.indexOf('utm_')===0)tracking.push([key,value]);});
+    var rawQuery=window.location.search.slice(1);
+    var kept=rawQuery?rawQuery.split('&').filter(function(part){
+      var rawKey=part.split('=',1)[0];
+      var decodedKey;
+      try{decodedKey=decodeURIComponent(rawKey.replace(/\+/g,' '));}
+      catch(error){return true;}
+      return !privateKeys[decodedKey];
+    }):[];
+    var clean=window.location.pathname+(kept.length?'?'+kept.join('&'):'')+window.location.hash;
+    try{
+      window.history.replaceState(null,'',clean);
+    }catch(error){return;}
+    var after=new URLSearchParams(window.location.search);
+    if(slotList.some(function(slot){return after.has(slot.key);})){return;}
+    window.__presellPrivacyReady=true;
+    function apply(){
+      document.querySelectorAll('[data-personalize]').forEach(function(element){
+        var slot=element.getAttribute('data-personalize');
+        if(Object.prototype.hasOwnProperty.call(values,slot))element.textContent=values[slot];
+      });
+      document.querySelectorAll('a[data-product-link]').forEach(function(anchor){
+        try{
+          var url=new URL(anchor.href,window.location.href);
+          slotList.forEach(function(slot){url.searchParams.delete(slot.key);});
+          var cleared={};
+          tracking.forEach(function(pair){
+            if(!cleared[pair[0]]){url.searchParams.delete(pair[0]);cleared[pair[0]]=true;}
+          });
+          tracking.forEach(function(pair){url.searchParams.append(pair[0],pair[1]);});
+          anchor.href=url.toString();
+        }catch(error){}
+      });
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});
+    else apply();
+  })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1a1a2e;
+      --color-accent: #e94560;
+      --color-cta: #e94560;
+      --color-cta-text: #ffffff;
+      --color-background: #ffffff;
+      --color-text: #1a1a2e;
+      --color-muted: #6c757d;
+      --color-border: #dee2e6;
+      --color-soft: #f8f9fa;
+      --font-heading: 'DM Sans', Georgia, serif;
+      --font-body: 'DM Sans', Arial, sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html{background:var(--color-background);}
+    body{margin:0;color:var(--color-text);background:var(--color-background);font-family:var(--font-body);font-size:18px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+    .presell-main{margin:0 auto;max-width:720px;padding:48px 22px 72px;}
+    .presell-hero{margin-bottom:44px;text-align:center;}
+    .presell-hero h1{color:var(--color-primary);font-family:var(--font-heading);font-size:clamp(2rem,7vw,3.55rem);font-weight:700;letter-spacing:-.025em;line-height:1.12;margin:0 auto 18px;max-width:680px;}
+    .presell-hero p{color:var(--color-muted);font-size:1.05rem;margin:0 auto;max-width:600px;}
+    .presell-divider{background:var(--color-accent);height:3px;margin:0 auto 46px;width:54px;}
+    .presell-section{margin:0 0 38px;}
+    .presell-section h2{color:var(--color-primary);font-family:var(--font-heading);font-size:clamp(1.35rem,4vw,1.8rem);line-height:1.3;margin:0 0 16px;}
+    .presell-copy p{margin:0 0 18px;}
+    .presell-copy p:last-child{margin-bottom:0;}
+    .presell-section-cta,.presell-close{margin:28px 0 46px;text-align:center;}
+    .presell-close{border-top:1px solid var(--color-border);padding-top:34px;}
+    .presell-button{background:var(--color-cta);border-radius:10px;color:var(--color-cta-text);display:inline-block;font-weight:700;line-height:1.2;padding:17px 34px;text-decoration:none;}
+    .presell-button:focus,.presell-button:hover{filter:brightness(.92);}
+    @media(max-width:520px){body{font-size:17px}.presell-main{padding-top:34px}.presell-button{display:block;padding-left:18px;padding-right:18px}}
+  </style>
+  
+  <script>
+  (function(){
+    if(!window.__presellPrivacyReady)return;
+    var endpoint='https://ftwqfgojkrkdpglneifn.supabase.co/functions/v1/funnel-analytics';
+    var deploymentId='b7-browser-pass';
+    var params=new URLSearchParams(window.location.search);
+    function send(type,data){
+      try{navigator.sendBeacon(endpoint,JSON.stringify(Object.assign({deployment_id:deploymentId,event_type:type,utm_source:params.get('utm_source')||'',utm_medium:params.get('utm_medium')||'',utm_campaign:params.get('utm_campaign')||''},data||{})));}catch(error){}
+    }
+    send('page_view');
+    document.addEventListener('click',function(event){
+      var link=event.target.closest('a[data-product-link]');
+      if(link)send('cta_click',{cta_position:link.getAttribute('data-cta-position')||'unknown'});
+    });
+  })();
+  </script>
+  
+</head>
+<body data-deployment-id="b7-browser-pass">
+  <main class="presell-main">
+    <section class="presell-hero">
+      <h1>A test page for one real-browser pass</h1>
+      <p>Hello <span data-personalize="fn">reader</span>, this page exists only for a browser measurement by ContextArchitect</p>
+    </section>
+    <div class="presell-divider"></div>
+    <section class="presell-section" id="section-what-this-is">
+      <h2>What this page is</h2>
+      <div class="presell-copy"><p>This page was written by ContextArchitect for Funnel Factory Session 42, to measure how a pre-sell page behaves in a real browser.</p>
+<p>It carries no offer and no client copy. Nothing on it is for sale, and it is removed when the measurement ends.</p>
+</div>
+      <div class="presell-section-cta"><a class="presell-button" data-product-link data-cta-position="mid" href="https://product.b7-s42.invalid/offer?ref&#x3D;b7">Open the test link</a></div>
+    </section>
+    <section class="presell-section" id="section-what-it-measures">
+      <h2>What the pass measures</h2>
+      <div class="presell-copy"><p>How fast the page opens, what it tells the next site, and how it clears the personal details from its address before any tracking runs.</p>
+<p>It also measures what happens when a visitor leaves the page and comes back.</p>
+</div>
+      
+    </section>
+    <section class="presell-close">
+      <a class="presell-button" data-product-link data-cta-position="final" href="https://product.b7-s42.invalid/offer?ref&#x3D;b7">Open the test link again</a>
+    </section>
+  </main>
+</body>
+</html>
