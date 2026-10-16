@@ -18,5 +18,15 @@
     "deployed_at": "2026-10-16T15:18:28.829Z",
     "updated": false,
     "operation": "67ba799752a7bb21f081727d927043213e3fc2ee3da40bce7061b846d6d8af66"
+  },
+  {
+    "slug": "ce-first-publish",
+    "title": "ce first publish",
+    "funnel_type": "advertorial",
+    "profile": "problem-aware",
+    "url": "https://demo.econstructor.ai/ce-first-publish/",
+    "deployed_at": "2026-10-16T15:24:50.141Z",
+    "updated": false,
+    "operation": "864e2cf0ef7a9dbee600fd81ef3ff5ac4cb38a47223e0a3c7dcaf2b5a95e9147"
   }
 ]
